@@ -1,6 +1,6 @@
 aoc-starter
 black
+flake8
 mypy
 pre-commit
-pylint
 pytest
