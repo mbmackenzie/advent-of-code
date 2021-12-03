@@ -38,7 +38,10 @@ class Day01(Solution):
         return get_num_increases(self.data)
 
     def _part_two(self) -> int:
-        """How many increases if you use the sum of windows of three consecutive measurements?"""
+        """
+        How many increases if you use the sum of windows of three
+        consecutive measurements?
+        """
         windows = zip(self.data[:-2], self.data[1:-1], self.data[2:])
         return get_num_increases([sum(w) for w in windows])
 
