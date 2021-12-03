@@ -1,5 +1,6 @@
 aoc-starter
 black
 mypy
+pre-commit
 pylint
 pytest
