@@ -4,12 +4,6 @@ import re
 from aoc.reformaters import combine_nonblank_lines
 from aoc.solution import Solution
 
-REAL_NUMBERS = """
-87,7,82,21,47,88,12,71,24,35,10,90,4,97,30,55,36,74,19,50,23,46,13,44,69,27,2,0,37,33,99,49,77,15,89,98,31,51,22,96,73,94,95,18,52,78,32,83,85,54,75,84,59,25,76,45,20,48,9,28,39,70,63,56,5,68,61,26,58,92,67,53,43,62,17,81,80,66,91,93,41,64,14,8,57,38,34,16,42,11,86,72,40,65,79,6,3,29,60,1
-"""
-
-TEST_NUMBERS = """"""
-
 TEST_DATA = """
 7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
@@ -112,11 +106,13 @@ class Day04(Solution):
 
         return -1
 
+    def _pop_lines(self) -> None:
+        self.pulls = list(map(int, self.input.pop_line().split(",")))
+
     def _get_data(self) -> list[Board]:
         def parse_board(input: str) -> Board:
             return Board(list(map(int, re.split(r"\s+", input))))
 
-        self.pulls = list(map(int, REAL_NUMBERS.split(",")))
         return self.input.as_list(parse_board)
 
     def _reformat_data(self) -> None:
@@ -128,7 +124,6 @@ def test_solution(data: str) -> None:
     solution = Day04()
     solution.set_input_data(data.split("\n"))
 
-    print(solution.part_one())
     assert solution.part_one() == 4512
     assert solution.part_two() == 1924
 
