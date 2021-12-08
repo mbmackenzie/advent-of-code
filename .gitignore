@@ -2,6 +2,7 @@
 .vscode
 
 input.txt
+.aoc_cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
