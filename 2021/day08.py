@@ -16,19 +16,6 @@ egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
 gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 """.strip()
 
-SEGMENT_LOOKUP = {
-    0: "012456",
-    1: "25",
-    2: "02346",
-    3: "02356",
-    4: "1235",
-    5: "01356",
-    6: "013456",
-    7: "025",
-    8: "0123456",
-    9: "012356",
-}
-
 
 class Day08(Solution):
     """Solution to day 8 of the 2021 Advent of Code"""
