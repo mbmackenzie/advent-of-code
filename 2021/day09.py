@@ -13,8 +13,8 @@ TEST_DATA = """
 9899965678
 """.strip()
 
-Grid = dict[tuple[int, int], int]
 Point = tuple[int, int]
+Grid = dict[Point, int]
 
 
 def get_neighbors(point: Point) -> Generator[Point, None, None]:
