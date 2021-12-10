@@ -1,6 +1,6 @@
 """Day 9"""
 from functools import reduce
-from typing import NamedTuple
+from typing import Generator
 
 from aoc.solution import Solution
 
@@ -13,57 +13,44 @@ TEST_DATA = """
 9899965678
 """.strip()
 
-Grid = list[list[int]]
+Point = tuple[int, int]
+Grid = dict[Point, int]
 
 
-class Point(NamedTuple):
-    row: int
-    col: int
-    value: int
-
-
-def get_neighbors(grid: Grid, row: int, column: int) -> list[Point]:
+def get_neighbors(point: Point) -> Generator[Point, None, None]:
     """Get the neighbors of a cell"""
-    neighbors = []
-    for i in range(row - 1, row + 2):
-        if i == row or i < 0 or i >= len(grid):
-            continue
-        neighbors.append(Point(i, column, grid[i][column]))
-
-    for j in range(column - 1, column + 2):
-        if j == column or j < 0 or j >= len(grid[0]):
-            continue
-        neighbors.append(Point(row, j, grid[row][j]))
-
-    return neighbors
+    i, j = point
+    yield i + 1, j
+    yield i - 1, j
+    yield i, j + 1
+    yield i, j - 1
 
 
 def find_low_points(grid: Grid) -> list[Point]:
     """Find the low points"""
     low_points = []
-    for i, row in enumerate(grid):
-        for j, value in enumerate(row):
-            neighbors = get_neighbors(grid, i, j)
-            if value < min([n.value for n in neighbors]):
-                low_points.append(Point(i, j, value))
+    for point, value in grid.items():
+        if all([value < grid.get(n, 9) for n in get_neighbors(point)]):
+            low_points.append(point)
 
     return low_points
 
 
-def find_basin(grid: Grid, low_point: Point) -> set[Point]:
+def find_basin(grid: Grid, point: Point) -> set[Point]:
     """Find the basin"""
-    basin: set[Point] = {low_point}
+    basin: set[Point] = {point}
 
-    def traverse_basin(current: Point) -> None:
-        neighbors = get_neighbors(grid, current.row, current.col)
-        for neighbor in neighbors:
-            if neighbor.value == 9:
+    def traverse_basin(point: Point) -> None:
+        value = grid[point]
+        for neighbor in get_neighbors(point):
+            n_value = grid.get(neighbor, 9)
+            if n_value == 9:
                 continue
-            elif neighbor.value > current.value and neighbor not in basin:
+            elif n_value > value and neighbor not in basin:
                 basin.add(neighbor)
                 traverse_basin(neighbor)
 
-    traverse_basin(low_point)
+    traverse_basin(point)
     return basin
 
 
@@ -79,7 +66,7 @@ class Day09(Solution):
         on your heightmap?
         """
         low_points = find_low_points(self.data)
-        return sum(p.value + 1 for p in low_points)
+        return sum(self.data[p] + 1 for p in low_points)
 
     def _part_two(self) -> int:
         """
@@ -95,10 +82,14 @@ class Day09(Solution):
         return reduce(lambda x, y: x * y, sorted(basin_lens)[-3:])
 
     def _get_data(self) -> Grid:
-        def parse_line(line: str) -> list[int]:
-            return [int(x) for x in line]
+        data = self.input.as_list(lambda line: [int(x) for x in line])
 
-        return self.input.as_list(parse_line)
+        grid: Grid = dict()
+        for i, row in enumerate(data):
+            for j, value in enumerate(row):
+                grid[(i, j)] = value
+
+        return grid
 
 
 def test_solution(data: str) -> None:
