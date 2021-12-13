@@ -1,10 +1,80 @@
 """Day 12: Passage Pathing"""
 from collections import defaultdict
-from typing import Optional
+from typing import NamedTuple
 
+import pytest
 from aoc.solution import Solution
 
-TEST_DATA = """
+CaveSystem = dict[str, set[str]]
+
+
+def find_total_paths(cave_system: CaveSystem, allow_double_visits: bool = False) -> int:
+    class State(NamedTuple):
+        path: tuple[str, ...]
+        double_visit: bool
+
+    paths: set[tuple[str, ...]] = set()
+
+    initial_state = State(("start",), False)
+    stack: list[State] = [initial_state]
+
+    while stack:
+        state = stack.pop()
+        cave = state.path[-1]
+
+        if cave == "end":
+            paths.add(state.path)
+            continue
+
+        for next_cave in cave_system[cave]:
+            if next_cave == "start":
+                continue
+
+            if next_cave.isupper() or next_cave not in state.path:
+                new_state = State((*state.path, next_cave), state.double_visit)
+                stack.append(new_state)
+                continue
+
+            if allow_double_visits:
+                if not state.double_visit and state.path.count(next_cave) == 1:
+                    new_state = State((*state.path, next_cave), True)
+                    stack.append(new_state)
+                continue
+
+    return len(paths)
+
+
+class Day12(Solution):
+    """Solution to day 12 of the 2021 Advent of Code"""
+
+    def __init__(self) -> None:
+        super().__init__(2021, 12, "Passage Pathing")
+
+    def _part_one(self) -> int:
+        """
+        How many paths through this cave system are there that visit
+        small caves at most once?
+        """
+        return find_total_paths(self.data)
+
+    def _part_two(self) -> int:
+        """Given these new rules, how many paths through this cave system are there?"""
+        return find_total_paths(self.data, allow_double_visits=True)
+
+    def _get_data(self) -> CaveSystem:
+        cave_system: CaveSystem = defaultdict(set)
+
+        for line in self.input.as_list():
+            cave1, cave2 = line.split("-")
+            cave_system[cave1].add(cave2)
+
+            if not (cave1 == "start" or cave2 == "end"):
+                cave_system[cave2].add(cave1)
+
+        return cave_system
+
+
+TEST_DATA1 = """
 start-A
 start-b
 A-c
@@ -14,175 +84,59 @@ A-end
 b-end
 """.strip()
 
-Cave = tuple[str, bool]
-CaveSystem = dict[str, list[str]]
+TEST_DATA2 = """
+dc-end
+HN-start
+start-kj
+dc-start
+dc-HN
+LN-dc
+HN-end
+kj-sa
+kj-HN
+kj-dc
+""".strip()
 
-total = 0
-
-
-def find_total_paths(
-    graph: CaveSystem,
-    big_caves: set[str],
-    start: str = "start",
-    end: str = "end",
-    visited: Optional[dict[str, bool]] = None,
-    path: Optional[list[str]] = None,
-    total: int = 0,
-) -> int:
-
-    if not visited:
-        visited = defaultdict(lambda: False)
-
-    if not path:
-        path = []
-
-    visited[start] = True
-    path.append(start)
-
-    if start in big_caves:
-        visited[start] = False
-
-    if start == end:
-        total += 1
-    else:
-        for node in graph[start]:
-            if visited[node] is False:
-                total = find_total_paths(
-                    graph, big_caves, node, end, visited, path, total
-                )
-
-    path.pop()
-    visited[start] = False
-
-    return total
+TEST_DATA3 = """
+fs-end
+he-DX
+fs-he
+start-DX
+pj-DX
+end-zg
+zg-sl
+zg-pj
+pj-he
+RW-he
+fs-DX
+pj-RW
+zg-RW
+start-pj
+he-WI
+zg-he
+pj-fs
+start-RW
+""".strip()
 
 
-def find_total_paths2(
-    graph: CaveSystem,
-    big_caves: set[str],
-    small_cave_exception: str,
-    start: str = "start",
-    end: str = "end",
-    visited: Optional[dict[str, bool]] = None,
-    path: Optional[list[str]] = None,
-    total: int = 0,
-    paths: Optional[list[list[str]]] = None,
-    small_cave_count: int = 0,
-) -> tuple[int, list[list[str]]]:
-
-    if not visited:
-        visited = defaultdict(lambda: False)
-
-    if not path:
-        path = []
-
-    if not paths:
-        paths = []
-
-    visited[start] = True
-    path.append(start)
-
-    if start in big_caves:
-        visited[start] = False
-
-    if start == small_cave_exception:
-        small_cave_count += 1
-        if small_cave_count < 2:
-            visited[start] = False
-
-    if start == end:
-        total += 1
-        paths.append(path.copy())
-    else:
-        for node in graph[start]:
-            if visited[node] is False:
-                total, paths = find_total_paths2(
-                    graph,
-                    big_caves,
-                    small_cave_exception,
-                    node,
-                    end,
-                    visited,
-                    path,
-                    total,
-                    paths,
-                    small_cave_count,
-                )
-
-    path.pop()
-    visited[start] = False
-
-    return total, paths
-
-
-class Day12(Solution):
-    """Solution to day 12 of the 2021 Advent of Code"""
-
-    big_caves: set[str]
-    small_caves: set[str]
-
-    def __init__(self) -> None:
-        super().__init__(2021, 12, "Passage Pathing")
-
-    def _part_one(self) -> int:
-        """TODO"""
-        return find_total_paths(self.data, self.big_caves)
-
-    def _part_two(self) -> int:
-        """TODO"""
-        all_paths = []
-
-        print(len(self.small_caves))
-
-        for i, small_cave in enumerate(self.small_caves):
-            print(f"{i}/{len(self.small_caves)}")
-            tot, paths = find_total_paths2(self.data, self.big_caves, small_cave)
-            print(f"Found {tot} paths")
-            for path in paths:
-                if path not in all_paths:
-                    all_paths.append(path)
-            print(f"Found {len(all_paths)} unique paths")
-
-        return len(all_paths)
-
-    def _get_data(self) -> CaveSystem:
-        self.big_caves = set()
-        self.small_caves = set()
-        system: CaveSystem = defaultdict(list)
-
-        def make_cave(name: str) -> str:
-            if name == name.upper():
-                self.big_caves.add(name)
-            else:
-                if name not in ("start", "end"):
-                    self.small_caves.add(name)
-
-            return name
-
-        def make_caves(line: str) -> tuple[str, str]:
-            node1, node2 = line.split("-")
-            return make_cave(node1), make_cave(node2)
-
-        caves = self.input.as_list(make_caves)
-        for cave1, cave2 in caves:
-            system[cave1].append(cave2)
-
-            if not (cave1 == "start" or cave2 == "end"):
-                system[cave2].append(cave1)
-
-        return system
-
-
-def test_solution(data: str) -> None:
+@pytest.mark.parametrize(
+    "data,part,expected",
+    [
+        (TEST_DATA1, "part_one", 10),
+        (TEST_DATA2, "part_one", 19),
+        (TEST_DATA3, "part_one", 226),
+        (TEST_DATA1, "part_two", 36),
+        (TEST_DATA2, "part_two", 103),
+        (TEST_DATA3, "part_two", 3509),
+    ],
+)
+def test_solution_part_one(data: str, part: str, expected: int) -> None:
     """Test the solution"""
     solution = Day12()
     solution.set_input_data(data.split("\n"))
 
-    part_one = solution.part_one()
-    part_two = solution.part_two()
-    assert part_one == 10, f"Part one test failed, got {part_one}"
-    assert part_two == 36, f"Part one test failed, got {part_two}"
+    assert getattr(solution, part)() == expected
 
 
 if __name__ == "__main__":
-    test_solution(TEST_DATA)
+    pytest.main(["2021/day12.py"])
