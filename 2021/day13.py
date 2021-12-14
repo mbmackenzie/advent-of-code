@@ -29,55 +29,61 @@ fold along x=5
 """.strip()
 
 
-Grid = set[tuple[int, int]]
-Instructions = list[tuple[str, int]]
+Point = tuple[int, int]
+Grid = set[Point]
+
+Fold = tuple[str, int]
+Folds = list[Fold]
 
 
-def fold_point(point: tuple[int, int], axis: str, value: int) -> tuple[int, int]:
+def fold_point(point: Point, axis: str, value: int) -> Point:
     """Fold a point along a direction"""
     x, y = point
-
     if axis == "x":
-        if x < value:
-            return x, y
-
-        diff = x - value
-        return value - diff, y
-
-    if axis == "y":
-        if y < value:
-            return x, y
-
-        diff = y - value
-        return x, value - diff
-
-    raise ValueError(f"Invalid axis: {axis}")
-
-
-def run_instructions(
-    grid: Grid, fold_instructions: Instructions, num_instructions: Optional[int] = None
-) -> Grid:
-
-    if not num_instructions:
-        use_instructions = fold_instructions
+        new_x = x if x < value else value - (x - value)
+        return new_x, y
+    elif axis == "y":
+        new_y = y if y < value else value - (y - value)
+        return x, new_y
     else:
-        use_instructions = fold_instructions[:num_instructions]
+        raise ValueError(f"Invalid axis: {axis}")
 
-    showing_points = grid.copy()
-    for axis, value in use_instructions:
+
+def run_instructions(grid: Grid, folds: Folds, n_folds: Optional[int] = None) -> Grid:
+
+    showing_points = grid
+    for i, (axis, value) in enumerate(folds):
+
         new_points = set()
         for point in showing_points:
             new_points.add(fold_point(point, axis, value))
 
-        showing_points = new_points.copy()
+        showing_points = new_points
+
+        if n_folds and i == n_folds - 1:
+            break
 
     return showing_points
+
+
+def show_grid(grid: Grid) -> None:
+    """Show the grid"""
+    max_x = max(x for x, _ in grid)
+    max_y = max(y for _, y in grid)
+
+    for y in range(max_y + 1):
+        for x in range(max_x + 1):
+            if (x, y) in grid:
+                print("#", end="")
+            else:
+                print(" ", end="")
+        print()
 
 
 class Day13(Solution):
     """Solution to day 13 of the 2021 Advent of Code"""
 
-    fold_instructions: list[tuple[str, int]]
+    folds: Folds
 
     def __init__(self) -> None:
         super().__init__(2021, 13, "Transparent Origami")
@@ -87,45 +93,27 @@ class Day13(Solution):
         How many dots are visible after completing just the first fold
         instruction on your transparent paper?
         """
-        return len(run_instructions(self.data, self.fold_instructions, 1))
+        return len(run_instructions(self.data, self.folds, 1))
 
     def _part_two(self) -> str:
         """
         What code do you use to activate the infrared thermal imaging camera system?
-
         The manual says the code is always eight capital letters.
         """
-        final_grid = run_instructions(self.data, self.fold_instructions)
-
-        max_x = max(x for x, _ in final_grid)
-        max_y = max(y for _, y in final_grid)
-        min_x = min(x for x, _ in final_grid)
-        min_y = min(y for _, y in final_grid)
-
-        for y in range(min_y, max_y + 1):
-            for x in range(min_x, max_x + 1):
-                if (x, y) in final_grid:
-                    print("#", end="")
-                else:
-                    print(" ", end="")
-            print()
-
+        show_grid(run_instructions(self.data, self.folds))
         return "See printed output"
 
-    def _get_data(self) -> set[tuple[int, int]]:
-        data = self.input.as_list()
+    def _get_data(self) -> Grid:
+        data = "\n".join(self.input.as_list())
+        coords_str, folds_str = data.split("\n\n")
 
-        where_to_split = data.index("")
-        coords_list: list[str] = data[:where_to_split]
-        folds_list: list[str] = data[where_to_split + 1 :]
-
-        self.fold_instructions = list()
-        for fold in folds_list:
+        self.folds = list()
+        for fold in folds_str.split("\n"):
             axis, value = fold.replace("fold along ", "").split("=")
-            self.fold_instructions.append((axis, int(value)))
+            self.folds.append((axis, int(value)))
 
-        points: set[tuple[int, int]] = set()
-        for coord in coords_list:
+        points: Grid = set()
+        for coord in coords_str.split("\n"):
             x, y = coord.split(",")
             points.add((int(x), int(y)))
 
@@ -138,9 +126,9 @@ def test_solution(data: str) -> None:
     solution.set_input_data(data.split("\n"))
 
     part_one = solution.part_one()
-    solution.part_two()
     assert part_one == 17, f"Part one failed, got {part_one}"
-    # assert part_two == NotImplemented, f"Part two failed, got {part_two}"
+
+    solution.part_two()
 
 
 if __name__ == "__main__":
