@@ -1,7 +1,6 @@
 """Day 17: Trick Shot"""
 import re
-from dataclasses import dataclass
-from dataclasses import field
+from collections import namedtuple
 
 from aoc.solution import Solution
 
@@ -10,99 +9,53 @@ TEST_DATA = """
 target area: x=20..30, y=-10..-5
 """.strip()
 
-
-@dataclass
-class TargetArea:
-    min_x: int
-    max_x: int
-    min_y: int
-    max_y: int
-
-    def check_within(self, x: int, y: int) -> bool:
-        return (self.min_x <= x <= self.max_x) and (self.min_y <= y <= self.max_y)
+TargetArea = namedtuple("TargetArea", ["x1", "x2", "y1", "y2"])
+Velocity = namedtuple("Velocity", ["dx", "dy"])
 
 
-@dataclass(unsafe_hash=True)
-class Velocity:
-    x: int
-    y: int
-
-    def apply_drag(self) -> None:
-        if self.x != 0:
-            self.x += -1 * (1 if self.x > 0 else -1)
-
-        self.y -= 1
-
-
-@dataclass
 class Probe:
-    initial_velocity: Velocity
-    target_area: TargetArea = field(repr=False)
+    max_height: int
 
-    x: int = field(init=False)
-    y: int = field(init=False)
-    velocity: Velocity = field(init=False, repr=False)
-    path: list[tuple[int, int]] = field(init=False, repr=False)
+    def __init__(self, initial_velocity: Velocity, target_area: TargetArea) -> None:
+        self.initial_velocity = initial_velocity
+        self.target_area = target_area
 
-    @property
-    def max_height(self) -> int:
-        return max(self.path, key=lambda p: p[1])[1]
+        self.reaches_target = self._is_reachable()
 
-    @property
-    def position(self) -> tuple[int, int]:
-        return self.x, self.y
+    def _is_reachable(self) -> bool:
+        x = y = 0
+        dx = self.initial_velocity.dx
+        dy = self.initial_velocity.dy
 
-    def reset(self) -> None:
-        self.x = 0
-        self.y = 0
-        self.velocity = Velocity(self.initial_velocity.x, self.initial_velocity.y)
-        self.path = []
-        self.step_count = 0
+        max_height = 0
+        while not (
+            self.target_area.x1 <= x <= self.target_area.x2
+            and self.target_area.y1 <= y <= self.target_area.y2
+        ):
+            x += dx
+            y += dy
+            max_height = max(max_height, y)
 
-    def run_step(self) -> None:
-        self.x += self.velocity.x
-        self.y += self.velocity.y
-        self.velocity.apply_drag()
-        self.path.append((self.x, self.y))
+            dx = max(dx - 1, 0)
+            dy -= 1
 
-        self.step_count += 1
-
-    def eventually_lands_in_target(self) -> bool:
-        self.reset()
-        while not self.target_area.check_within(self.x, self.y):
-            self.run_step()
-
-            if self.x > self.target_area.max_x or self.y < self.target_area.min_y:
+            if x > self.target_area.x2 or y < self.target_area.y1:
                 return False
 
+        self.max_height = max_height
         return True
 
 
-def get_velocities(target_area: TargetArea, chunk_size: int = 200) -> set[Velocity]:
-    good_initial_velocities: set[Velocity] = set()
-    start_x = 1
-    start_y = target_area.min_y
+def get_probes(target_area: TargetArea) -> list[Probe]:
+    good_probes: list[Probe] = []
 
-    while True:
-        hits_added = 0
-        end_x = start_x + chunk_size
-        end_y = start_y + chunk_size
+    for x in range(1, target_area.x2 + 1):
+        for y in range(target_area.y1, abs(target_area.y1) + 1):
+            probe = Probe(Velocity(x, y), target_area)
+            if probe.reaches_target:
+                good_probes.append(probe)
 
-        for x in range(start_x, end_x):
-            for y in range(start_y, end_y):
-                initial_velocity = Velocity(x, y)
-                p = Probe(initial_velocity, target_area)
-                if p.eventually_lands_in_target():
-                    good_initial_velocities.add(initial_velocity)
-                    hits_added += 1
-
-        if hits_added == 0:
-            break
-
-        start_x = end_x
-        start_y = end_y
-
-    return good_initial_velocities
+    return good_probes
 
 
 class Day17(Solution):
@@ -113,26 +66,17 @@ class Day17(Solution):
 
     def _part_one(self) -> int:
         """TODO"""
-        target_area: TargetArea = self.data
-
-        heights = []
-        for initial_velocity in get_velocities(target_area, chunk_size=1000):
-            p = Probe(initial_velocity, target_area)
-            if p.eventually_lands_in_target():
-                heights.append(p.max_height)
-
-        return max(heights)
+        return max([probe.max_height for probe in get_probes(self.data)])
 
     def _part_two(self) -> int:
         """TODO"""
-        target_area: TargetArea = self.data
-
-        initial_velocities = get_velocities(target_area, chunk_size=1000)
-        return len(initial_velocities)
+        return len(get_probes(self.data))
 
     def _get_data(self) -> TargetArea:
-        goal_str = self.input.as_list()[0]
-        return TargetArea(*[int(v) for v in re.findall(r"(-?\d+)", goal_str)])
+        ta_str = self.input.as_list()[0]
+        ta_re = re.compile(r"(-?\d+)")
+
+        return TargetArea(*map(int, ta_re.findall(ta_str)))
 
 
 def test_solution(data: str) -> None:
@@ -140,8 +84,11 @@ def test_solution(data: str) -> None:
     solution = Day17()
     solution.set_input_data(data.split("\n"))
 
-    assert solution.part_one() == 45
-    assert solution.part_two() == 112
+    part_one = solution.part_one()
+    assert part_one == 45, f"Part one failed, got {part_one}"
+
+    part_two = solution.part_two()
+    assert part_two == 112, f"Part two failed, got {part_two}"
 
 
 if __name__ == "__main__":
