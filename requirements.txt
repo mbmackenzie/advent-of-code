@@ -1,4 +1,3 @@
-aoc-starter
 black
 flake8
 mypy
