@@ -1,5 +1,7 @@
 .DS_Store
 .vscode
+.token
+scratch*.*
 
 input.txt
 .aoc_cache
