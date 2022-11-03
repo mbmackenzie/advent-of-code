@@ -16,24 +16,30 @@ def _run_test_cases(
         test_file = f.read()
 
     with TemporaryDirectory() as tmpdir:
-        filename = os.path.join(tmpdir, f"aoc{year}_{day:02}.py")
+        print(f"Running tests in '{tmpdir}'")
+        filename = os.path.abspath(os.path.join(tmpdir, f"aoc{year}_{day:02}.py"))
 
         with open(filename, "w") as f:
             f.write(test_file.format(year=year, day=day))
 
-        pytest_cmd = f"{sys.executable} -m pytest {filename}"
+        pytest_cmd = f"{sys.executable} -m pytest {os.path.basename(filename)}"
         if pytest_args is not None:
             pytest_cmd += " " + " ".join(pytest_args)
 
         if os.name == "nt":
             _run_on_windows(tmpdir, pytest_cmd)
         else:
-            run(pytest_cmd, shell=True, check=True)
+            _run_on_unix(tmpdir, pytest_cmd)
 
 
 def _run_on_windows(tmpdir: str, pytest_cmd: str) -> None:
     run(f"powershell.exe cd {tmpdir}; {pytest_cmd}", check=True)
 
 
+def _run_on_unix(tmpdir: str, pytest_cmd: str) -> None:
+    run(f"cd {tmpdir} && {pytest_cmd}", shell=True, check=True)
+
+
 if __name__ == "__main__":
     _run_test_cases(2019, 1, ["-vv", "-s"])
+    pass
