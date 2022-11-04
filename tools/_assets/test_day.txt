@@ -9,7 +9,7 @@ def test_part1(input_str, part1, part2):
     if part1 is None:
         pytest.skip("No test case for part 1")
 
-    assert solution.part1(input_str) == part1
+    assert solution.part1(input_str, testing=True) == part1
 
 
 @pytest.mark.parametrize("input_str, part1, part2", solution.TEST_CASES)
@@ -17,4 +17,4 @@ def test_part2(input_str, part1, part2):
     if part2 is None:
         pytest.skip("No test case for part 2")
 
-    assert solution.part2(input_str) == part2
+    assert solution.part2(input_str, testing=True) == part2

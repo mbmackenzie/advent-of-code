@@ -2,19 +2,26 @@
 import argparse
 import datetime
 import os
+import sys
 from collections import namedtuple
+from typing import NoReturn
 from typing import Optional
 from typing import Sequence
 
 import requests
 
-from tools.caching import _cache_data
-from tools.caching import _data_is_cached
-from tools.caching import _make_cache_dir
-from tools.runner import _run_solution
-from tools.tester import _run_test_cases
+from tools import caching
+from tools import running
 
 Day = namedtuple("Day", ["year", "day"])
+
+_SUBCOMMANDS = ["new", "pull", "test", "run", "submit", "preview"]
+
+
+class DefaultHelpParser(argparse.ArgumentParser):
+    def error(self, message: str) -> NoReturn:
+        self.print_help()
+        sys.exit(2)
 
 
 def _ensure_token() -> None:
@@ -50,7 +57,13 @@ def _get_day(year: Optional[int], day: Optional[int], day_year: Optional[str]) -
     current = _get_current_day()
 
     if day_year is not None:
-        day, year = map(int, day_year.split("-"))
+        if "-" in day_year:
+            day, year = map(int, day_year.split("-"))
+        elif len(day_year) == 4:
+            day = int(day_year[:2])
+            year = int(day_year[2:])
+        else:
+            raise ValueError(f"Invalid day-year format: {day_year}")
 
     if day is None and current.day == -1:
         raise ValueError("It's not December yet! Please specify a day.")
@@ -64,24 +77,24 @@ def _get_day(year: Optional[int], day: Optional[int], day_year: Optional[str]) -
     return Day(year, day)
 
 
-def _get_parser(description: Optional[str]) -> argparse.ArgumentParser:
+def _get_parser(description: Optional[str] = None) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("-d", "--day", type=int, help="The day")
     parser.add_argument("-y", "--year", type=int, help="The year")
-    parser.add_argument("day_year", help="The day and year")
+    parser.add_argument("day_year", nargs="?", help="The day and year (i.e., 01-22)")
     return parser
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
-    """Parse command line arguments and dispatch to subcommands."""
+def main(argv: Sequence[str] | None = None) -> int:
+    """Utility for creating, testing, and submitting Advent of Code solutions."""
 
-    parser = argparse.ArgumentParser(description=main.__doc__)
+    parser = DefaultHelpParser(description=main.__doc__)
     subparsers = parser.add_subparsers(title="subcommands", dest="subcommand", required=True)
 
-    _make_cache_dir()
-    funcs = {"new": new_day, "pull": pull_data, "run": run_solution, "submit": submit_answer}
+    caching.make_cache_dir()
 
-    for name, func in funcs.items():
+    for name in _SUBCOMMANDS:
+        func = globals()[name]
         subparsers.add_parser(name, help=func.__doc__, add_help=False)
 
     args, unknown = parser.parse_known_args(argv)
@@ -89,17 +102,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if args.subcommand in ("new", "pull", "submit"):
         _ensure_token()
 
-    return funcs[args.subcommand](unknown)
+    return globals()[args.subcommand](unknown)
 
 
-def new_day(argv: Optional[Sequence[str]] = None) -> int:
+def new(argv: Sequence[str] | None = None) -> int:
     """Create a new day's file and pull its data."""
-
-    parser = _get_parser(description=new_day.__doc__)
+    parser = _get_parser(description=new.__doc__)
     args = parser.parse_args(argv)
 
     year, day = _get_day(args.year, args.day, args.day_year)
-    pull_data(["--year", str(year), "--day", str(day)])
+    pull(["--year", str(year), "--day", str(day)])
 
     print(f"AOC day {day:02d}, {year} - creating files...")
 
@@ -110,22 +122,25 @@ def new_day(argv: Optional[Sequence[str]] = None) -> int:
     if os.path.exists(filename):
         print(f"File {filename} already exists, skipping.")
 
+    with open("tools/_assets/new_day.txt", "r") as file:
+        template = file.read()
+
     with open(f"{year}/day{day:02d}.py", "w") as file:
-        file.write(f'"""Day {day} of Advent of Code {year}"""')
+        file.write(template.format(year=year, day=day))
 
     return 0
 
 
-def pull_data(argv: Optional[Sequence[str]] = None) -> int:
+def pull(argv: Sequence[str] | None = None) -> int:
     """Pull puzzle data from Advent of Code."""
 
-    parser = _get_parser(description=pull_data.__doc__)
+    parser = _get_parser(description=pull.__doc__)
     parser.add_argument("--force", action="store_true", help="Force data download")
     args = parser.parse_args(argv)
 
     year, day = _get_day(args.year, args.day, args.day_year)
 
-    if not args.force and _data_is_cached(year, day):
+    if not args.force and caching.data_is_cached(year, day):
         print(f"AOC day {day:02d}, {year} - data is already cached.")
         return 0
 
@@ -138,37 +153,74 @@ def pull_data(argv: Optional[Sequence[str]] = None) -> int:
         print("Could not download data.")
         return 1
 
-    _cache_data(year, day, response.text)
+    caching.cache_data(year, day, response.text)
     return 0
 
 
-def run_solution(argv: Optional[Sequence[str]] = None) -> int:
-    """Run a solution to a puzzle using the days's data."""
-
-    parser = _get_parser(description=run_solution.__doc__)
-    parser.add_argument("-T", "--test", action="store_true", help="Use test data")
-    args, unknown = parser.parse_known_args(argv)
+def test(argv: Sequence[str] | None = None) -> int:
+    """Test a solution against the cached data."""
+    parser = _get_parser(description=test.__doc__)
+    args, pytest_args = parser.parse_known_args(argv)
 
     year, day = _get_day(args.year, args.day, args.day_year)
-    print(f"AOC day {day:02d}, {year} - running solution...")
 
-    parts = [1]
-
-    if args.test:
-        _run_test_cases(year, day, unknown)
-        return 0
-
-    _run_solution(year, day, parts)
-
+    print(f"AOC day {day:02d}, {year} - testing solution...")
+    running.run_test_cases(year, day, pytest_args)
     return 0
 
 
-def submit_answer(argv: Optional[Sequence[str]] = None) -> int:
-    """Submit a puzzle answer to Advent of Code."""
-
-    parser = argparse.ArgumentParser(description=submit_answer.__doc__)
+def run(argv: Sequence[str] | None = None) -> int:
+    """Run a solution to a puzzle using the days's data."""
+    parser = _get_parser(description=run.__doc__)
     args = parser.parse_args(argv)
 
-    print("Submitting answer...", args)
+    year, day = _get_day(args.year, args.day, args.day_year)
+
+    print(f"AOC day {day:02d}, {year} - running solution...")
+    running.preview_solution(year, day)
+    return 0
+
+
+def submit(argv: Sequence[str] | None = None) -> int:
+    """Submit a puzzle answer to Advent of Code."""
+
+    parser = _get_parser(description=submit.__doc__)
+    parser.add_argument("-p", "--part", type=int, required=True, help="The part")
+    args = parser.parse_args(argv)
+
+    year, day = _get_day(args.year, args.day, args.day_year)
+    result = running.run_solution_part(year, day, args.part)
+
+    print(f"AOC day {day:02d}, {year}")
+    print(f"Submitting part {args.part} answer: {result} ...")
+
+    response = requests.post(
+        f"https://adventofcode.com/{year}/day/{day}/answer",
+        headers={"Cookie": f"session={_read_cookie()}"},
+        data={"level": args.part, "answer": result},
+    )
+
+    print(response)
+    print(response.text)
 
     return 0
+
+
+def preview(argv: Sequence[str] | None = None) -> None:
+    """Print the cached data for a day."""
+
+    parser = _get_parser(description=preview.__doc__)
+    parser.add_argument("-l", "--lines", type=int, help="The number of lines to print")
+    args = parser.parse_args(argv)
+
+    year, day = _get_day(args.year, args.day, args.day_year)
+
+    if not caching.data_is_cached(year, day):
+        print(f"AOC day {day:02d}, {year} - data is not cached.")
+        return
+
+    print(f"AOC day {day:02d}, {year} - previewing data...")
+    with open(caching.cache_filename(year, day), "r") as file:
+        lines = args.lines if args.lines else 10
+        for _ in range(lines):
+            print(file.readline(), end="")
