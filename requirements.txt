@@ -1,6 +1,16 @@
 aoc-starter
 black
+click
+coverage
+flake8
 flake8
 mypy
+mypy
+pre-commit
 pre-commit
 pytest
+pytest
+requests
+responses
+tox
+types-requests
