@@ -1,8 +1,6 @@
 """Day 13: Transparent Origami"""
 from typing import Optional
 
-from aoc.solution import Solution
-
 
 TEST_DATA = """
 6,10
@@ -27,6 +25,8 @@ TEST_DATA = """
 fold along y=7
 fold along x=5
 """.strip()
+
+TEST_CASES = ((TEST_DATA, 17, "See printed output"),)
 
 
 Point = tuple[int, int]
@@ -80,56 +80,46 @@ def show_grid(grid: Grid) -> None:
         print()
 
 
-class Day13(Solution):
-    """Solution to day 13 of the 2021 Advent of Code"""
+def _get_data(input_str: str) -> tuple[Folds, Grid]:
+    coords_str, folds_str = input_str.split("\n\n")
 
-    folds: Folds
+    folds: Folds = list()
+    for fold in folds_str.strip().split("\n"):
+        axis, value = fold.replace("fold along ", "").split("=")
+        folds.append((axis, int(value)))
 
-    def __init__(self) -> None:
-        super().__init__(2021, 13, "Transparent Origami")
+    points: Grid = set()
+    for coord in coords_str.strip().split("\n"):
+        x, y = coord.split(",")
+        points.add((int(x), int(y)))
 
-    def _part_one(self) -> int:
-        """
-        How many dots are visible after completing just the first fold
-        instruction on your transparent paper?
-        """
-        return len(run_instructions(self.data, self.folds, 1))
-
-    def _part_two(self) -> str:
-        """
-        What code do you use to activate the infrared thermal imaging camera system?
-        The manual says the code is always eight capital letters.
-        """
-        show_grid(run_instructions(self.data, self.folds))
-        return "See printed output"
-
-    def _get_data(self) -> Grid:
-        data = "\n".join(self.input.as_list())
-        coords_str, folds_str = data.split("\n\n")
-
-        self.folds = list()
-        for fold in folds_str.split("\n"):
-            axis, value = fold.replace("fold along ", "").split("=")
-            self.folds.append((axis, int(value)))
-
-        points: Grid = set()
-        for coord in coords_str.split("\n"):
-            x, y = coord.split(",")
-            points.add((int(x), int(y)))
-
-        return points
+    return folds, points
 
 
-def test_solution(data: str) -> None:
-    """Test the solution"""
-    solution = Day13()
-    solution.set_input_data(data.split("\n"))
+def part1(input_str: str, testing: bool = False) -> int:
+    """
+    How many dots are visible after completing just the first fold
+    instruction on your transparent paper?
+    """
 
-    part_one = solution.part_one()
-    assert part_one == 17, f"Part one failed, got {part_one}"
+    folds, data = _get_data(input_str)
+    return len(run_instructions(data, folds, 1))
 
-    solution.part_two()
+
+def part2(input_str: str, testing: bool = False) -> str:
+    """
+    What code do you use to activate the infrared thermal imaging camera system?
+    The manual says the code is always eight capital letters.
+    """
+    folds, data = _get_data(input_str)
+    show_grid(run_instructions(data, folds))
+    return "See printed output"
 
 
 if __name__ == "__main__":
-    test_solution(TEST_DATA)
+
+    with open(".aoc_cache/2021_13.txt", "r") as f:
+        input_str = f.read().strip()
+
+    print(part1(input_str))
+    print(part2(input_str))
