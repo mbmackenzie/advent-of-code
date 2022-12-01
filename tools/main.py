@@ -200,9 +200,6 @@ def submit(argv: Sequence[str] | None = None) -> int:
         data={"level": args.part, "answer": result},
     )
 
-    print(response)
-    print(response.text)
-
     return 0
 
 
