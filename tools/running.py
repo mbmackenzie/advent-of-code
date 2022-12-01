@@ -22,7 +22,7 @@ def load_solution(year: int, day: int) -> ModuleType:
     return module
 
 
-def preview_solution(year: int, day: int) -> None:
+def preview_solution(year: int, day: int, raise_errors: bool = False) -> None:
 
     input_str = load_cached_data(year, day)
     solution = load_solution(year, day)
@@ -41,6 +41,9 @@ def preview_solution(year: int, day: int) -> None:
             print(f"Part {part}: Not implemented yet")
         except Exception as e:
             print(f"Part {part}: Failed with {e.__class__.__name__}")
+
+            if raise_errors:
+                raise
 
 
 def run_solution_part(year: int, day: int, part: int) -> int:

@@ -172,12 +172,13 @@ def test(argv: Sequence[str] | None = None) -> int:
 def run(argv: Sequence[str] | None = None) -> int:
     """Run a solution to a puzzle using the days's data."""
     parser = _get_parser(description=run.__doc__)
+    parser.add_argument("-E", "--raise-errors", action="store_true", help="Raise exceptions")
     args = parser.parse_args(argv)
 
     year, day = _get_day(args.year, args.day, args.day_year)
 
     print(f"AOC day {day:02d}, {year} - running solution...")
-    running.preview_solution(year, day)
+    running.preview_solution(year, day, raise_errors=args.raise_errors)
     return 0
 
 
