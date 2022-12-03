@@ -26,13 +26,8 @@ def priority(item_type: str) -> int:
     return 27 + (ord(item_type) - ord("A"))
 
 
-def get_shared_items(rucksacks: Iterable[str]) -> str:
-    common: set[str] = reduce(set.intersection, map(lambda x: set(x), rucksacks))
-
-    if len(common) != 1:
-        raise ValueError("There is no single shared item")
-
-    return common.pop()
+def get_shared_item(items: Iterable[str]) -> str:
+    return reduce(set.intersection, map(lambda x: set(x), items)).pop()
 
 
 @split_lines
@@ -43,14 +38,14 @@ def part1(data: list[str]) -> int:
         midpoint = len(s) // 2
         return s[:midpoint], s[midpoint:]
 
-    return sum(priority(get_shared_items(half_string(rs))) for rs in data)
+    return sum(priority(get_shared_item(half_string(rs))) for rs in data)
 
 
 @group_lines(lines_per_group=3, split_groups=True)
 def part2(data: list[list[str]]) -> int:
     """Part 2 solution"""
 
-    return sum(priority(get_shared_items(blocks)) for blocks in data)
+    return sum(priority(get_shared_item(blocks)) for blocks in data)
 
 
 if __name__ == "__main__":
