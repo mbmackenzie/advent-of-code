@@ -29,9 +29,7 @@ CN -> C
 InsertionRules = dict[str, str]
 
 
-def run_pair_insertion(
-    template: str, rules: InsertionRules, num_steps: int = 10
-) -> Counter[str]:
+def run_pair_insertion(template: str, rules: InsertionRules, num_steps: int = 10) -> Counter[str]:
     pair_counts = Counter(["".join(p) for p in pairwise(template)])
 
     for _ in range(num_steps):

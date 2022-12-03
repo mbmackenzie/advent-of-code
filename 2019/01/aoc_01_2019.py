@@ -20,12 +20,12 @@ def calc_fuel(x: int) -> int:
     return x // 3 - 2
 
 
-def part1(input_str: str, testing: bool = False) -> int:
+def part1(input_str: str) -> int:
     """Part 1 solution"""
     return sum(map(calc_fuel, parse_data(input_str)))
 
 
-def part2(input_str: str, testing: bool = False) -> int:
+def part2(input_str: str) -> int:
     """Part 2 solution"""
     data = parse_data(input_str)
 

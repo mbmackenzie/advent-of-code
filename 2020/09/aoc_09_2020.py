@@ -56,9 +56,7 @@ class Day09(Solution):
         """Find contiguous set numbers (len >= 2) in data that add to first invalid value"""
         first_invalid_value = find_first_invalid_value(self.data)
         for i, _ in enumerate(self.data):
-            if contiguous_set := find_contiguous_set(
-                first_invalid_value, self.data[i:]
-            ):
+            if contiguous_set := find_contiguous_set(first_invalid_value, self.data[i:]):
                 return min(contiguous_set) + max(contiguous_set)
 
         return -1

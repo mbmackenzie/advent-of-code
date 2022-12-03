@@ -4,9 +4,7 @@ import re
 from aoc import Solution
 
 
-def generic_num_paths_to_target_bag(
-    data: list[list[int]], bags: list[str], target: str
-) -> int:
+def generic_num_paths_to_target_bag(data: list[list[int]], bags: list[str], target: str) -> int:
     """Generic solution"""
     ends_at_target = [0] * len(bags)
     target_idx = bags.index(target)
@@ -26,9 +24,7 @@ def generic_num_paths_to_target_bag(
     return sum(ends_at_target)
 
 
-def generic_total_bags_in_target_bag(
-    data: list[list[int]], bags: list[str], target: str
-) -> int:
+def generic_total_bags_in_target_bag(data: list[list[int]], bags: list[str], target: str) -> int:
     """Generic solution"""
     target_idx = bags.index(target)
 

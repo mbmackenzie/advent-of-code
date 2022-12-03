@@ -41,7 +41,7 @@ def get_shared_items(rucksacks: Iterable[str]) -> str:
 
 
 @split_lines
-def part1(data: list[str], testing: bool = False) -> int:
+def part1(data: list[str]) -> int:
     """Part 1 solution"""
 
     def half_string(s: str) -> tuple[str, str]:
@@ -52,13 +52,13 @@ def part1(data: list[str], testing: bool = False) -> int:
 
 
 @group_lines(lines_per_group=3, split_groups=True)
-def part2(data: list[list[str]], testing: bool = False) -> int:
+def part2(data: list[list[str]]) -> int:
     """Part 2 solution"""
 
     return sum(priority(get_shared_items(blocks)) for blocks in data)
 
 
 if __name__ == "__main__":
-    # part1(TEST_DATA)
-    # part2(TEST_DATA)
+    # print(part1(TEST_DATA))
+    # print(part2(TEST_DATA))
     pass

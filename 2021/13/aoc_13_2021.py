@@ -96,7 +96,7 @@ def _get_data(input_str: str) -> tuple[Folds, Grid]:
     return folds, points
 
 
-def part1(input_str: str, testing: bool = False) -> int:
+def part1(input_str: str) -> int:
     """
     How many dots are visible after completing just the first fold
     instruction on your transparent paper?
@@ -106,7 +106,7 @@ def part1(input_str: str, testing: bool = False) -> int:
     return len(run_instructions(data, folds, 1))
 
 
-def part2(input_str: str, testing: bool = False) -> str:
+def part2(input_str: str) -> str:
     """
     What code do you use to activate the infrared thermal imaging camera system?
     The manual says the code is always eight capital letters.

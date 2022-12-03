@@ -117,6 +117,8 @@ class OperatorPacket(Packet):
                 return 1 if first < second else 0
             case 7:
                 return 1 if first == second else 0
+            case _:
+                raise ValueError(f"Invalid type_id: {self.type_id}")
 
     def _get_subpackets(self, bin_string: str) -> list[Packet]:
 
@@ -179,7 +181,7 @@ class Day16(Solution):
         what do you get if you add up the version numbers in all packets?
         """
         packet = make_packet(self.data)
-        return sum(packet.get_all_sub_versions())
+        return sum(packet.get_all_sub_versions())  # type: ignore
 
     def _part_two(self) -> int:
         """

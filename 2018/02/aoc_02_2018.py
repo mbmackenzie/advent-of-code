@@ -27,7 +27,7 @@ TEST_CASES = (
 )
 
 
-def part1(input_str: str, testing: bool = False) -> int:
+def part1(input_str: str) -> int:
     """Part 1 solution"""
 
     num_twos = 0
@@ -47,7 +47,7 @@ def part1(input_str: str, testing: bool = False) -> int:
     return num_twos * num_threes
 
 
-def part2(input_str: str, testing: bool = False) -> str:
+def part2(input_str: str) -> str:
     """Part 2 solution"""
 
     lines = input_str.strip().splitlines()

@@ -1,4 +1,5 @@
 """Day 2 of Advent of Code 2019"""
+from tools import AOC_TESTING
 from tools.parsing import comma_separated_ints
 
 TEST_CASES = (
@@ -10,10 +11,10 @@ TEST_CASES = (
 
 
 @comma_separated_ints
-def part1(data: list[int], testing: bool = False) -> int:
+def part1(data: list[int]) -> int:
     """Part 1 solution"""
 
-    if testing is False:
+    if not AOC_TESTING:
         data[1] = 12
         data[2] = 2
 

@@ -32,9 +32,7 @@ class Day13(Solution):
     def _part_one(self) -> int:
         """TODO"""
         busses = [x for x in self.data if x > 0]
-        best_times = [
-            get_best_possible_time(bus_number, self.min_time) for bus_number in busses
-        ]
+        best_times = [get_best_possible_time(bus_number, self.min_time) for bus_number in busses]
 
         best_time = min(best_times)
         best_bus = busses[best_times.index(best_time)]

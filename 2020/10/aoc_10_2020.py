@@ -17,9 +17,7 @@ class Day10(Solution):
         return self.data[-1] + 3
 
     def _part_one(self) -> int:
-        counts = Counter(
-            val - prev for val, prev in zip(self.data, [0, *self.data[:-1]])
-        )
+        counts = Counter(val - prev for val, prev in zip(self.data, [0, *self.data[:-1]]))
 
         return counts[1] * (counts[3] + 1)
 

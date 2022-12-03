@@ -47,9 +47,7 @@ def get_num_occupied(x: int, y: int, grid: Grid, acceptable: str) -> int:
     return neighbors.count("#")
 
 
-def update_grid(
-    old_grid: Grid, acceptable: str = ".L#", min_occupied_to_switch: int = 4
-) -> Grid:
+def update_grid(old_grid: Grid, acceptable: str = ".L#", min_occupied_to_switch: int = 4) -> Grid:
     """Update the grid"""
     new_grid = [""] * len(old_grid)
     for i, row in enumerate(old_grid):
@@ -94,9 +92,7 @@ class Day11(Solution):
         - people ignore empty space
         - people need 5 or more occupied seats to leave
         """
-        stable_grid = update_until_stable(
-            self.data, acceptable="L#", min_occupied_to_switch=5
-        )
+        stable_grid = update_until_stable(self.data, acceptable="L#", min_occupied_to_switch=5)
         return sum(seat == "#" for row in stable_grid for seat in row)
 
     def _get_data(self) -> Grid:

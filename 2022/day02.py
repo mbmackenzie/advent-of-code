@@ -38,14 +38,14 @@ CHOICE = {"X": 1, "Y": 2, "Z": 3}
 FORCE = {"X": 0, "Y": 3, "Z": 6}
 
 
-def part1(input_str: str, testing: bool = False) -> int:
+def part1(input_str: str) -> int:
     """Part 1 solution"""
 
     games = map(str.split, input_str.splitlines())
     return sum(OUTCOMES[f"{p1}{p2}"] + CHOICE[p2] for p1, p2 in games)
 
 
-def part2(input_str: str, testing: bool = False) -> int:
+def part2(input_str: str) -> int:
     """Part 2 solution"""
 
     games = map(str.split, input_str.splitlines())

@@ -18,13 +18,13 @@ TEST_CASES = tuple((i.replace(", ", "\n"), *j) for i, *j in _TEST_CASES)
 
 
 @line_separated_ints
-def part1(data: list[int], testing: bool = False) -> int:
+def part1(data: list[int]) -> int:
     """Part 1 solution"""
     return sum(data)
 
 
 @line_separated_ints
-def part2(data: list[int], testing: bool = False) -> int:
+def part2(data: list[int]) -> int:
     """Part 2 solution"""
 
     counter: dict[int, int] = defaultdict(int)
