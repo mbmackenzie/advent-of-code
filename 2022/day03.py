@@ -16,19 +16,14 @@ CrZsJsPPZsGzwwsLwLmpwMDw
 
 TEST_CASES = ((TEST_DATA, 157, 70),)
 
-LETTERS = "abcdefghijklmnopqrstuvwxyz"
-
 
 def priority(item_type: str) -> int:
     """Return the priority of an item type"""
 
-    if item_type not in LETTERS + LETTERS.upper():
-        raise ValueError(f"Invalid item type: {item_type}")
+    if item_type.islower():
+        return 1 + (ord(item_type) - ord("a"))
 
-    if item_type in LETTERS:
-        return LETTERS.index(item_type) + 1
-
-    return 26 + LETTERS.index(item_type.lower()) + 1
+    return 27 + (ord(item_type) - ord("A"))
 
 
 def get_shared_items(rucksacks: Iterable[str]) -> str:
