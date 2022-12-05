@@ -1,13 +1,11 @@
 """Day {day} of Advent of Code {year}"""
 
 
-TEST_DATA = """
+TEST_DATA = """\
 
 """
 
-TEST_CASES = (
-    (TEST_DATA, None, None),
-)
+TEST_CASES = ((TEST_DATA, None, None),)
 
 
 def part1(input_str: str) -> int:
@@ -18,6 +16,7 @@ def part1(input_str: str) -> int:
 def part2(input_str: str) -> int:
     """Part 2 solution"""
     raise NotImplementedError
+
 
 if __name__ == "__main__":
     # print(part1(TEST_DATA))

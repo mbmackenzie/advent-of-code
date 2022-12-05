@@ -2,6 +2,20 @@
 
 https://adventofcode.com
 
+### CURRENTLY A WIP, THIS IS THE PROPOSED APP. CHECKLIST FOR PROGRESS:
+
+- [ ] Store puzzle input and known answers in a database
+- [ ] Workspace initialization
+- [ ] Multi-language support via plugins
+  - [ ] Solution template generation
+  - [ ] Solution Runner
+  - [ ] Solution testing
+  - [ ] Input parsers
+- [ ] Solution submission
+- [ ] Solution benchmarking
+- [ ] Private leaderboard tracker/reports
+- [ ] Personal stats report
+
 ## Solutions
 
 _Example_
@@ -108,3 +122,22 @@ Rank  Name                  Stars  Points  Rank Change
 * Congratulations to Jane Mackenzie for getting points
 on the global leaderboard yesterday!
 ```
+
+## Plugins
+
+- Runners
+- Parsers
+
+## What happens
+
+- You run `aoc init` and provide your username and token
+- You run `aoc new` and provide the day and language, for example `aoc new --lang=python 01-22`
+- The toolkit downloads the input for that day and year, and creates a solution template for that day and language - `solutions/2022/01/aoc_01_2022.py`
+- You write python code to solve the problem
+- You run `aoc test --lang=python` to test your solution against the test cases
+- The toolkit does loads the correct plugin for the language
+- the plugin does whatever it needs to test the solution - probably generating some testing code, and running it with a subprocess call
+- the result is printed
+- You run `aoc run --lang=python` to run your solution against the true input
+- Similar to testing, the toolkit loads the correct plugin for the language, and the plugin does whatever it needs to run the solution
+- The only difference, if the output is formmatted correctly, the toolkit can interpret it, and then do more with it it, like submitting, saving, etc...

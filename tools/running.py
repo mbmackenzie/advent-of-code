@@ -1,17 +1,47 @@
 import importlib.util
 import os
 import sys
+from dataclasses import dataclass
 from subprocess import run
 from tempfile import TemporaryDirectory
 from types import ModuleType
+from typing import Protocol
 from typing import Sequence
 
 from tools.caching import load_cached_data
 from tools.parsing import SolutionFunction
 
 
+# TODO: something like this - 1 per supported language
+class SolutionExecutor(Protocol):
+
+    filename: str
+
+    def run(self) -> None:
+        ...
+
+    def test(self) -> None:
+        ...
+
+
+@dataclass
+class PythonExecutor:
+
+    filename: str
+
+    def run(self) -> None:
+        ...
+
+    def test(self) -> None:
+        ...
+
+
+def get_file_name(year: int, day: int) -> str:
+    return f"solutions/{year}/{day:02}/aoc_{day:02}_{year}.py"
+
+
 def load_solution(year: int, day: int) -> ModuleType:
-    spec = importlib.util.spec_from_file_location("solution", f"{year}/day{day:02}.py")
+    spec = importlib.util.spec_from_file_location("solution", get_file_name(year, day))
 
     if spec is None:
         raise ImportError("Could not import solution file.")
@@ -71,12 +101,12 @@ def _run_pytest_on_unix(tmpdir: str, pytest_cmd: str) -> None:
 
 def run_test_cases(year: int, day: int, pytest_args: Sequence[str] | None = None) -> None:
 
-    with open("tools/_assets/test_day.txt") as f:
+    with open("plugins/python_default/_solution_pytester.txt") as f:
         test_file = f.read()
 
     with TemporaryDirectory() as tmpdir:
         print(f"Running tests in '{tmpdir}'")
-        filename = os.path.abspath(os.path.join(tmpdir, f"aoc{year}_{day:02}.py"))
+        filename = os.path.abspath(os.path.join(tmpdir, f"aoc_{day:02}_{year}.py"))
 
         with open(filename, "w") as f:
             f.write(test_file.format(year=year, day=day))

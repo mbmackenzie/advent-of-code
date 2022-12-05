@@ -122,7 +122,7 @@ def new(argv: Sequence[str] | None = None) -> int:
     if os.path.exists(filename):
         print(f"File {filename} already exists, skipping.")
 
-    with open("tools/_assets/new_day.txt", "r") as file:
+    with open("plugins/python_default/_solution_template.txt", "r") as file:
         template = file.read()
 
     with open(f"{year}/day{day:02d}.py", "w") as file:
@@ -200,6 +200,8 @@ def submit(argv: Sequence[str] | None = None) -> int:
         headers={"Cookie": f"session={_read_cookie()}"},
         data={"level": args.part, "answer": result},
     )
+
+    print(response.text)
 
     return 0
 
