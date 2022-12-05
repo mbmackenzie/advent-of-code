@@ -23,29 +23,22 @@ def get_range(s: str) -> range:
 def part1(data: list[str]) -> int:
     """Part 1 solution"""
 
-    tot = 0
-    for pair in data:
-        elf1, elf2 = pair.split(",")
+    def check_pair(pair: str) -> bool:
+        elf1, elf2 = map(get_range, pair.split(","))
+        return set(elf1).issubset(elf2) or set(elf2).issubset(elf1)
 
-        if set(get_range(elf1)) <= set(get_range(elf2)) or set(get_range(elf2)) <= set(
-            get_range(elf1),
-        ):
-            tot += 1
-
-    return tot
+    return sum(map(check_pair, data))
 
 
 @split_lines
 def part2(data: list[str]) -> int:
     """Part 2 solution"""
-    tot = 0
-    for pair in data:
-        elf1, elf2 = pair.split(",")
 
-        if set(get_range(elf1)) & set(get_range(elf2)):
-            tot += 1
+    def check_pair(pair: str) -> bool:
+        elf1, elf2 = map(get_range, pair.split(","))
+        return bool(set(elf1) & set(elf2))
 
-    return tot
+    return sum(map(check_pair, data))
 
 
 if __name__ == "__main__":
