@@ -125,7 +125,11 @@ def new(argv: Sequence[str] | None = None) -> int:
     with open("plugins/python_default/_solution_template.txt", "r") as file:
         template = file.read()
 
-    with open(f"{year}/day{day:02d}.py", "w") as file:
+    folder = f"solutions/{year}/{day:02d}"
+    if not os.path.exists(folder):
+        os.makedirs(folder, exist_ok=True)
+
+    with open(f"{folder}/aoc_{day:02d}_{year}.py", "w") as file:
         file.write(template.format(year=year, day=day))
 
     return 0
