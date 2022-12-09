@@ -64,6 +64,7 @@ class Point(NamedTuple):
         return self.x == other.x or self.y == other.y
 
     def jump_towards(self, other: Point, known_inline_move: Point | None = None) -> Point:
+        """Returns the vector to move towards the other point."""
 
         if self.is_in_line_with(other):
 
@@ -96,12 +97,12 @@ def part1(input_str: str) -> int:
 
         for _ in range(steps):
 
-            head = head + dhead
+            head += dhead
 
             if head.is_touching(tail):
                 continue
 
-            tail = tail + tail.jump_towards(head, known_inline_move=dhead)
+            tail += tail.jump_towards(head, known_inline_move=dhead)
             visited.add(tail)
 
             assert head.is_touching(tail)
@@ -127,13 +128,13 @@ def part2(input_str: str) -> int:
                 knot2 = knots[k2]
 
                 if k1 == "head":
-                    knot1 = knot1 + dhead
+                    knot1 += dhead
                     knots[k1] = knot1
 
                 if knot1.is_touching(knot2):
                     continue
 
-                knot2 = knot2 + knot2.jump_towards(knot1)
+                knot2 += knot2.jump_towards(knot1)
                 knots[k2] = knot2
 
                 if k2 == "tail":
