@@ -36,7 +36,7 @@ def part2(data: list[str]) -> int:
 
     def check_pair(pair: str) -> bool:
         elf1, elf2 = map(get_range, pair.split(","))
-        return bool(set(elf1) & set(elf2))
+        return bool(set(elf1).intersection(elf2))
 
     return sum(map(check_pair, data))
 

@@ -14,8 +14,8 @@ TEST_DATA = """\
 TEST_CASES = ((TEST_DATA, 21, 8),)
 
 
-Grid = dict[tuple[int, int], int]
 Point = tuple[int, int]
+Grid = dict[Point, int]
 
 directions = {
     "U": (-1, 0),

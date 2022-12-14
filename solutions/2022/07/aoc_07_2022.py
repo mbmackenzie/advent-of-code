@@ -94,5 +94,5 @@ def part2(input_str: str) -> int:
 
 
 if __name__ == "__main__":
-    # print(part1(TEST_DATA))
+    print(part1(TEST_DATA))
     print(part2(TEST_DATA))

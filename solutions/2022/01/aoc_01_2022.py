@@ -43,6 +43,5 @@ def part2(input_str: str) -> int:
 
 
 if __name__ == "__main__":
-    # part1()
-    # part2()
-    pass
+    part1(TEST_DATA)
+    part2(TEST_DATA)

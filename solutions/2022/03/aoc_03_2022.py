@@ -49,6 +49,5 @@ def part2(data: list[list[str]]) -> int:
 
 
 if __name__ == "__main__":
-    # print(part1(TEST_DATA))
-    # print(part2(TEST_DATA))
-    pass
+    print(part1(TEST_DATA))
+    print(part2(TEST_DATA))

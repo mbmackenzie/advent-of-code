@@ -53,11 +53,10 @@ def part2(input_str: str) -> int:
     # go from [p1, p2]: outcome -> [p1, outcome]: p2
     what_do = {f"{c[0]}{o}": c[1] for c, o in OUTCOMES.items()}
 
-    # FORCE of c2 is the outcome score, we need to find the choice score
+    # FORCE[c2] is the outcome score, we need to find the choice score
     return sum((o := FORCE[c2]) + CHOICE[what_do[f"{p1}{o}"]] for p1, c2 in games)
 
 
 if __name__ == "__main__":
-    # part1(TEST_DATA)
-    # part2(TEST_DATA)
-    pass
+    part1(TEST_DATA)
+    part2(TEST_DATA)
