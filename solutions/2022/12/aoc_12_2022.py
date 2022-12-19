@@ -80,10 +80,8 @@ def get_shortest_paths_from(grid: dict[Point, int], start: Point) -> dict[Point,
 
         for new_point in get_neighbors(point):
             if new_point in grid and grid[point] - grid[new_point] <= 1:
-
                 if (dist := shortest_paths[point] + 1) <= shortest_paths[new_point]:
                     shortest_paths[new_point] = dist
-
                 queue.append(new_point)
 
     return shortest_paths
