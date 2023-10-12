@@ -1,3 +1,5 @@
+> Please go to 2022 Refresh branch: https://github.com/mbmackenzie/advent-of-code/tree/2022-refresh
+
 # Advent of Code
 
 ## Solutions
