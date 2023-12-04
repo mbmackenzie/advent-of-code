@@ -1,0 +1,50 @@
+{
+    "owner_id": 1278691,
+    "event": "2023",
+    "members": {
+        "1278691": {
+            "last_star_ts": 0,
+            "stars": 0,
+            "completion_day_level": {},
+            "name": "Matt Mackenzie",
+            "global_score": 0,
+            "local_score": 0,
+            "id": 1278691
+        },
+        "2000001": {
+            "last_star_ts": 1670409600,
+            "stars": 15,
+            "completion_day_level": {
+                "1": {
+                    "1": 1670303200,
+                    "2": 1670316800
+                },
+                "2": {
+                    "1": 1670389600,
+                    "2": 1670403200
+                }
+            },
+            "name": "Alex Johnson",
+            "global_score": 50,
+            "local_score": 100,
+            "id": 2000001
+        },
+        "3000001": {
+            "last_star_ts": 1670496000,
+            "stars": 10,
+            "completion_day_level": {
+                "1": {
+                    "1": 1670390400
+                },
+                "3": {
+                    "1": 1670484000,
+                    "2": 1670497600
+                }
+            },
+            "name": "Sarah Lee",
+            "global_score": 30,
+            "local_score": 70,
+            "id": 3000001
+        }
+    }
+}

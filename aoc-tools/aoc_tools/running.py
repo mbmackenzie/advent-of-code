@@ -8,13 +8,13 @@ from types import ModuleType
 from typing import Protocol
 from typing import Sequence
 
-from tools.caching import load_cached_data
-from tools.parsing import SolutionFunction
+from aoc_tools.caching import load_cached_data
+from aoc_tools.parsing import SolutionFunction
+
+from aoc_tools.default_plugins.python import plugin
 
 
-# TODO: something like this - 1 per supported language
 class SolutionExecutor(Protocol):
-
     filename: str
 
     def run(self) -> None:
@@ -26,7 +26,6 @@ class SolutionExecutor(Protocol):
 
 @dataclass
 class PythonExecutor:
-
     filename: str
 
     def run(self) -> None:
@@ -37,7 +36,7 @@ class PythonExecutor:
 
 
 def get_file_name(year: int, day: int) -> str:
-    return f"solutions/{year}/{day:02}/aoc_{day:02}_{year}.py"
+    return f"{year}/{day:02}/aoc_{day:02}_{year}.py"
 
 
 def load_solution(year: int, day: int) -> ModuleType:
@@ -53,12 +52,10 @@ def load_solution(year: int, day: int) -> ModuleType:
 
 
 def preview_solution(year: int, day: int, raise_errors: bool = False) -> None:
-
     input_str = load_cached_data(year, day)
     solution = load_solution(year, day)
 
     for part in (1, 2):
-
         func: SolutionFunction | None = getattr(solution, f"part{part}", None)
 
         if func is None:
@@ -99,10 +96,10 @@ def _run_pytest_on_unix(tmpdir: str, pytest_cmd: str) -> None:
     run(f"cd {tmpdir} && {pytest_cmd}", shell=True, check=True)
 
 
-def run_test_cases(year: int, day: int, pytest_args: Sequence[str] | None = None) -> None:
-
-    with open("plugins/python_default/_solution_pytester.txt") as f:
-        test_file = f.read()
+def run_test_cases(
+    year: int, day: int, pytest_args: Sequence[str] | None = None
+) -> None:
+    test_file = plugin.TESTING_TEMPLATE
 
     with TemporaryDirectory() as tmpdir:
         print(f"Running tests in '{tmpdir}'")

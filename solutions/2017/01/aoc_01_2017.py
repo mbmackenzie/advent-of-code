@@ -1,8 +1,6 @@
-"""Day {day} of Advent of Code {year}"""
+"""Day 1 of Advent of Code 2017"""
 
-
-TEST_DATA = """\
-
+TEST_DATA = """
 """
 
 TEST_CASES = ((TEST_DATA, None, None),)

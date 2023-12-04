@@ -10,12 +10,12 @@ from typing import Sequence
 
 import requests
 
-from tools import caching
-from tools import running
+from aoc_tools import caching
+from aoc_tools import running
+
+from aoc_tools.default_plugins.python import plugin
 
 Day = namedtuple("Day", ["year", "day"])
-
-_SUBCOMMANDS = ["new", "pull", "test", "run", "submit", "preview"]
 
 
 class DefaultHelpParser(argparse.ArgumentParser):
@@ -85,24 +85,24 @@ def _get_parser(description: Optional[str] = None) -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    """Utility for creating, testing, and submitting Advent of Code solutions."""
+def init(argv: Sequence[str] | None = None) -> int:
+    """Initialize the Advent of Code directory structure."""
 
-    parser = DefaultHelpParser(description=main.__doc__)
-    subparsers = parser.add_subparsers(title="subcommands", dest="subcommand", required=True)
 
-    caching.make_cache_dir()
+    parser = _get_parser(
+        description="Initialize the Advent of Code directory structure."
+    )
+    
+    args = parser.parse_args(argv)
 
-    for name in _SUBCOMMANDS:
-        func = globals()[name]
-        subparsers.add_parser(name, help=func.__doc__, add_help=False)
+    if not os.path.exists(f"README.md"):
+        with open(f"README.md", "w") as file:
+            file.write(f"# Advent of Code Solutions\n\n")
 
-    args, unknown = parser.parse_known_args(argv)
+    if not os.path.exists(f"plugins"):
+        os.mkdir(f"plugins")
 
-    if args.subcommand in ("new", "pull", "submit"):
-        _ensure_token()
-
-    return globals()[args.subcommand](unknown)
+    return 0
 
 
 def new(argv: Sequence[str] | None = None) -> int:
@@ -122,15 +122,12 @@ def new(argv: Sequence[str] | None = None) -> int:
     if os.path.exists(filename):
         print(f"File {filename} already exists, skipping.")
 
-    with open("plugins/python_default/_solution_template.txt", "r") as file:
-        template = file.read()
-
-    folder = f"solutions/{year}/{day:02d}"
+    folder = f"{year}/{day:02d}"
     if not os.path.exists(folder):
         os.makedirs(folder, exist_ok=True)
 
     with open(f"{folder}/aoc_{day:02d}_{year}.py", "w") as file:
-        file.write(template.format(year=year, day=day))
+        file.write(plugin.SOLUTION_TEMPLATE.format(year=year, day=day))
 
     return 0
 
@@ -176,7 +173,9 @@ def test(argv: Sequence[str] | None = None) -> int:
 def run(argv: Sequence[str] | None = None) -> int:
     """Run a solution to a puzzle using the days's data."""
     parser = _get_parser(description=run.__doc__)
-    parser.add_argument("-E", "--raise-errors", action="store_true", help="Raise exceptions")
+    parser.add_argument(
+        "-E", "--raise-errors", action="store_true", help="Raise exceptions"
+    )
     args = parser.parse_args(argv)
 
     year, day = _get_day(args.year, args.day, args.day_year)
@@ -228,3 +227,49 @@ def preview(argv: Sequence[str] | None = None) -> None:
         lines = args.lines if args.lines else 10
         for _ in range(lines):
             print(file.readline(), end="")
+
+
+def create_token(argv: Sequence[str] | None = None) -> int:
+    """Create a session token file for Advent of Code."""
+
+    parser = argparse.ArgumentParser(description=create_token.__doc__)
+    parser.add_argument("token", help="The session token")
+    args = parser.parse_args(argv)
+
+    with open(".token", "w") as file:
+        file.write(args.token)
+
+    return 0
+
+
+_SUBCOMMANDS = {
+    "init": init,
+    "new": new,
+    "pull": pull,
+    "test": test,
+    "run": run,
+    "submit": submit,
+    "preview": preview,
+    "create-token": create_token,
+}
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Utility for creating, testing, and submitting Advent of Code solutions."""
+
+    parser = DefaultHelpParser(description=main.__doc__)
+    subparsers = parser.add_subparsers(
+        title="subcommands", dest="subcommand", required=True
+    )
+
+    caching.make_cache_dir()
+
+    for name, func in _SUBCOMMANDS.items():
+        subparsers.add_parser(name, help=func.__doc__, add_help=False)
+
+    args, unknown = parser.parse_known_args(argv)
+
+    if args.subcommand in ("new", "pull", "submit"):
+        _ensure_token()
+
+    return _SUBCOMMANDS[args.subcommand](unknown)

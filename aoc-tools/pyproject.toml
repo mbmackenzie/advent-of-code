@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "aoc-tools"
+version = "0.1.0"
+description = ""
+authors = ["Matt Mackenzie <mbm2228@columbia.edu>"]
+readme = "README.md"
+
+
+[tool.poetry.scripts]
+aoc = 'aoc_tools.main:main'
+aoc-tools = 'aoc_tools.cli.main:app'
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+click = "^8.1.7"
+httpx = "^0.25.2"
+pendulum = "^2.1.2"
+pydantic = "^2.5.2"
+typer = {extras = ["all"], version = "^0.9.0"}
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.11.0"
+coverage = "^7.3.2"
+flake8 = "^6.1.0"
+mypy = "^1.7.1"
+pre-commit = "^3.5.0"
+pytest = "^7.4.3"
+tox = "^4.11.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
