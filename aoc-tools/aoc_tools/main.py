@@ -9,10 +9,8 @@ from typing import Optional
 from typing import Sequence
 
 import requests
-
 from aoc_tools import caching
 from aoc_tools import running
-
 from aoc_tools.default_plugins.python import plugin
 
 Day = namedtuple("Day", ["year", "day"])
@@ -88,11 +86,8 @@ def _get_parser(description: Optional[str] = None) -> argparse.ArgumentParser:
 def init(argv: Sequence[str] | None = None) -> int:
     """Initialize the Advent of Code directory structure."""
 
+    parser = _get_parser(description="Initialize the Advent of Code directory structure.")
 
-    parser = _get_parser(
-        description="Initialize the Advent of Code directory structure."
-    )
-    
     args = parser.parse_args(argv)
 
     if not os.path.exists(f"README.md"):
@@ -173,9 +168,7 @@ def test(argv: Sequence[str] | None = None) -> int:
 def run(argv: Sequence[str] | None = None) -> int:
     """Run a solution to a puzzle using the days's data."""
     parser = _get_parser(description=run.__doc__)
-    parser.add_argument(
-        "-E", "--raise-errors", action="store_true", help="Raise exceptions"
-    )
+    parser.add_argument("-E", "--raise-errors", action="store_true", help="Raise exceptions")
     args = parser.parse_args(argv)
 
     year, day = _get_day(args.year, args.day, args.day_year)
@@ -258,9 +251,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     """Utility for creating, testing, and submitting Advent of Code solutions."""
 
     parser = DefaultHelpParser(description=main.__doc__)
-    subparsers = parser.add_subparsers(
-        title="subcommands", dest="subcommand", required=True
-    )
+    subparsers = parser.add_subparsers(title="subcommands", dest="subcommand", required=True)
 
     caching.make_cache_dir()
 

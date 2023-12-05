@@ -1,5 +1,4 @@
 import pytest
-
 from tools.main import _get_parser
 
 

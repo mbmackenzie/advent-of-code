@@ -1,11 +1,10 @@
 """Day 2 of Advent of Code 2023"""
-
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import Iterator, NamedTuple
-
 import re
+from collections import defaultdict
+from typing import Iterator
+from typing import NamedTuple
 
 TEST_DATA = """\
 Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green

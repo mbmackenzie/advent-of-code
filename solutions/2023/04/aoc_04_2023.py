@@ -1,7 +1,7 @@
 """Day 4 of Advent of Code 2023"""
-
 from collections import defaultdict
-from typing import Iterator, NamedTuple
+from typing import Iterator
+from typing import NamedTuple
 
 
 TEST_DATA = """\
@@ -42,9 +42,7 @@ def iter_cards(input_str: str) -> Iterator[Card]:
 def part1(input_str: str) -> int:
     """Part 1 solution"""
     return sum(
-        2 ** (card.num_correct - 1)
-        for card in iter_cards(input_str)
-        if card.num_correct > 0
+        2 ** (card.num_correct - 1) for card in iter_cards(input_str) if card.num_correct > 0
     )
 
 

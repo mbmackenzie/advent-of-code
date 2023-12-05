@@ -1,10 +1,10 @@
-import typer
-from rich import print
+from typing import Annotated
+from typing import Optional
 
-from typing import Annotated, Optional
 import pendulum
-
+import typer
 from aoc_tools import plugins
+from rich import print
 from rich.table import Table
 
 app = typer.Typer()
@@ -30,14 +30,18 @@ def get_puzzle_date(day: int | None, year: int | None) -> pendulum.Date:
 def discover():
     """Discover available plugins."""
     print("Discovering plugins.")
-    
+
     plugins.discover()
-    
+
     table = Table("Plugin", "--name", "--lang")
-    
+
     for plugin in plugins.plugins:
-        table.add_row(plugin.config.title, plugin.config.name, plugin.config.lang,)
-        
+        table.add_row(
+            plugin.config.title,
+            plugin.config.name,
+            plugin.config.lang,
+        )
+
     print(table)
 
 
@@ -54,7 +58,7 @@ def new(
 
     print(
         f"NEW PUZZLE | [bold green]Day {puzzle_date.day} "
-        f"of Advent of Code {puzzle_date.year}[/bold green]"
+        f"of Advent of Code {puzzle_date.year}[/bold green]",
     )
 
     solution_generator = find_solution_generator(lang, plugin)

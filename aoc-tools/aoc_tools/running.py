@@ -9,9 +9,8 @@ from typing import Protocol
 from typing import Sequence
 
 from aoc_tools.caching import load_cached_data
-from aoc_tools.parsing import SolutionFunction
-
 from aoc_tools.default_plugins.python import plugin
+from aoc_tools.parsing import SolutionFunction
 
 
 class SolutionExecutor(Protocol):
@@ -96,9 +95,7 @@ def _run_pytest_on_unix(tmpdir: str, pytest_cmd: str) -> None:
     run(f"cd {tmpdir} && {pytest_cmd}", shell=True, check=True)
 
 
-def run_test_cases(
-    year: int, day: int, pytest_args: Sequence[str] | None = None
-) -> None:
+def run_test_cases(year: int, day: int, pytest_args: Sequence[str] | None = None) -> None:
     test_file = plugin.TESTING_TEMPLATE
 
     with TemporaryDirectory() as tmpdir:

@@ -1,5 +1,4 @@
 """Day 3 of Advent of Code 2023"""
-
 from collections import defaultdict
 from functools import reduce
 from typing import NamedTuple
@@ -47,9 +46,7 @@ def parse_grid(input_str: str) -> Grid:
     return grid
 
 
-def discover_symbol_neighbours(
-    symbols: SymbolToPoints, grid: Grid, point: Point
-) -> list[Point]:
+def discover_symbol_neighbours(symbols: SymbolToPoints, grid: Grid, point: Point) -> list[Point]:
     x, y = point
 
     # orthogonals
@@ -115,7 +112,7 @@ def part2(input_str: str) -> int:
     """Part 2 solution"""
     grid = parse_grid(input_str)
     symbals = get_symbol_neighbours(grid)
-    
+
     next_to_symbol = list(reduce(lambda x, y: x.union(y), symbals.values(), set()))
 
     point_to_num_map = {}
@@ -144,9 +141,7 @@ def part2(input_str: str) -> int:
 
     symbals_to_starting_points = {}
     for sym, points in symbals.items():
-        symbals_to_starting_points[sym] = set(
-            [point_to_num_map[point] for point in points]
-        )
+        symbals_to_starting_points[sym] = set([point_to_num_map[point] for point in points])
 
     print(symbals_to_starting_points)
 
