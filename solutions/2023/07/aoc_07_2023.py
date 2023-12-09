@@ -15,7 +15,7 @@ KTJJT 220
 QQQJA 483
 """
 
-TEST_CASES = ((TEST_DATA, None, None),)
+TEST_CASES = ((TEST_DATA, 6440, 5905),)
 
 NORMAL_ORDER = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 WILD_ORDER = ["J", "2", "3", "4", "5", "6", "7", "8", "9", "T", "Q", "K", "A"]
