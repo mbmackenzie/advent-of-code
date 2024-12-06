@@ -1,6 +1,7 @@
 .token
 .current_puzzle
 input.txt
+t.py
 
 # Python-generated files
 __pycache__/
